@@ -115,7 +115,7 @@ sub create {
 sub run {
 	my $self = shift;
 
-	my $fn
+	my ( $fn )
 		= @_ == 1 && $_[0] !~ /^-/ ? $self->create( $_[0] )
 		: @_ == 2 && $_[0] eq '-r' ? $self->create( $_[1], 'recreate' )
 		: @_ == 2 && $_[0] eq '-e' ? $self->open( $_[1] )

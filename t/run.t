@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 use strict; use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 24;
 use SQL::PatchDAG;
 
-my @arg;
+my ( @arg, @exec );
 $ENV{'EDITOR'} = 'false';
 
 BEGIN {
@@ -12,8 +12,8 @@ BEGIN {
 	our @ISA = 'SQL::PatchDAG';
 	sub create { @arg = ( create => @_ );   $_[1] }
 	sub open   { @arg = ( open   => @_ ); ( $_[1], \*STDERR ) }
-	sub run    { @arg = (); undef $@; eval { shift->SUPER::run( @_ ) } }
-	sub _exec  { 1 }
+	sub run    { @arg = @exec = (); undef $@; eval { shift->SUPER::run( @_ ) } }
+	sub _exec  { @exec = @_; 1 }
 }
 
 my $p = Test::SQL::PatchDAG->new;
@@ -27,6 +27,7 @@ for (
 	my $ok = defined $p->run( @$argv );
 	is $@, '', "Successful invocation with qw( @$argv )";
 	is "@arg", "@expected", "... and $expected[0] is called correctly";
+	is "@exec", "$p $ENV{'EDITOR'} foo", "... resulting in the correct exec call";
 }
 
 my $um = "usage: $0 [ -r | -e ] <patchname>\n";
