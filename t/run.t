@@ -18,13 +18,12 @@ BEGIN {
 my $p = Test::SQL::PatchDAG->new;
 
 for (
-	[ ''   => ( 'create', $p, 'foo' ) ],
-	[ '-e' => ( 'open',   $p, 'foo' ) ],
-	[ '-r' => ( 'create', $p, 'foo', 'recreate' ) ],
+	[ [qw(    foo )] => ( 'create', $p, 'foo' ) ],
+	[ [qw( -e foo )] => ( 'open',   $p, 'foo' ) ],
+	[ [qw( -r foo )] => ( 'create', $p, 'foo', 'recreate' ) ],
 ) {
-	my ( $switch, @expected ) = @$_;
-	my @argv = ( $switch || (), 'foo' );
-	is $p->run( @argv ), $p, "Successful invocation with qw( @argv )";
+	my ( $argv, @expected ) = @$_;
+	is $p->run( @$argv ), $p, "Successful invocation with qw( @$argv )";
 	is "@arg", "@expected", '... and create is called correctly';
 }
 
