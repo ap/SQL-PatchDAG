@@ -124,8 +124,10 @@ sub run {
 	die "No editor to run, EDITOR environment variable unset\n"
 		if do { no warnings 'uninitialized'; '' eq $ENV{'EDITOR'} };
 
-	exec $ENV{'EDITOR'}, $fn;
+	$self->_exec( $ENV{'EDITOR'}, $fn );
 }
+
+sub _exec { shift; exec { $_[0] } @_ }
 
 1;
 
