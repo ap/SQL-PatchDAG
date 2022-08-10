@@ -4,8 +4,8 @@ TODO user manual
 TODO tests and more tests
 
 0.102 Sat 11 Sep 2021
-	- Changelog fix
 	- No functional changes
+	- Changelog fix
 
 0.101 Fri 10 Sep 2021
 	- Bugfix for the -e switch
