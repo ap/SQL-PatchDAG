@@ -30,8 +30,8 @@ sub open :method {
 	die "Bad patch name '$name'\n" if $name !~ /\A[a-z0-9_][a-z0-9_-]*\z/;
 	my $fn = File::Spec->catfile( $self->dir, "$name.sql" );
 	my $mode = $do_rw ? Fcntl::O_RDWR() | Fcntl::O_CREAT() : Fcntl::O_RDONLY();
-	sysopen my $fh, $fn, $mode  or die "Couldn't open '$fn': $!\n";
-	binmode $fh, $self->binmode or die "Couldn't binmode '$fn': $!\n";
+	my $fh; eval q{ use open IO => $self->binmode; sysopen $fh, $fn, $mode }
+		or die "Couldn't open '$fn': $!\n";
 	( $fn, $fh );
 }
 
