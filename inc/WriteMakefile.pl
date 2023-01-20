@@ -1,56 +1,28 @@
-use 5.008001; use strict; use warnings;
+use strict; use warnings;
 
-my $sc = q<https://github.com/ap/SQL-PatchDAG>;
-my $bt = q<https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-PatchDAG>;
+require ExtUtils::MakeMaker;
 
-our %META = (
-	name        => 'SQL-PatchDAG',
-	author      => 'Aristotle Pagaltzis <pagaltzis@gmx.de>',
-	x_copyright => { holder => 'Aristotle Pagaltzis', year => 2020 },
-	license     => 'perl_5',
-	resources   => {
-		license    => [ 'http://dev.perl.org/licenses/' ],
-		repository => { type => 'git', url => "$sc.git", web => $sc },
-		bugtracker => { web => $bt },
-	},
-	dynamic_config => 0,
-	prereqs => {
-		runtime => {
-			requires => {qw(
-				perl 5.008001
-				Fcntl 0
-				File::Spec 0
-			)},
-		},
-		test => {
-			requires => {qw(
-				Test::More 0
-			)},
-		},
-	},
-);
+defined(our $distlib) or ($distlib = -d 'lib' ? 'lib' : '.');
+defined(our $manifest_cmd) or ($manifest_cmd = "git ls-files ':!README.pod'");
 
-sub MY::postamble { -f 'META.yml' ? return : <<'' }
+sub MY::postamble { -f 'META.yml' ? return : <<"" }
 create_distdir : MANIFEST
 distdir        : MANIFEST
 MANIFEST :
-	( git ls-files ':!README.pod' ; echo MANIFEST ) > MANIFEST
+	( $manifest_cmd ; echo MANIFEST ) > MANIFEST
 distdir : boilerplate
 .PHONY  : boilerplate
 boilerplate : distmeta
-	$(PERL) -Ilib inc/boilerplate.pl $(DISTVNAME)
+	\$(PERL) -I$distlib inc/boilerplate.pl \$(DISTVNAME)
 
-## BOILERPLATE ###############################################################
-require ExtUtils::MakeMaker;
-
-my %MM_ARGS;
+our (%META, %MM_ARGS);
 
 # have to do this since old EUMM dev releases miss the eval $VERSION line
 my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
 my $mymeta        = $eumm_version >= 6.57_02;
 my $mymeta_broken = $mymeta && $eumm_version < 6.57_07;
 
-(my $basepath = (-d 'lib' && 'lib/') . $META{name}) =~ s{-}{/}g;
+(my $basepath = "$distlib/$META{name}") =~ s{-}{/}g;
 
 ($MM_ARGS{NAME} = $META{name}) =~ s/-/::/g;
 $MM_ARGS{VERSION_FROM} = "$basepath.pm";
@@ -88,4 +60,3 @@ delete $MM_ARGS{CONFIGURE_REQUIRES}
 	if $eumm_version < 6.51_03;
 
 ExtUtils::MakeMaker::WriteMakefile(%MM_ARGS);
-## END BOILERPLATE ###########################################################
